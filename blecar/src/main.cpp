@@ -2,6 +2,7 @@
 #include <ArduinoJson.h>
 #include <NimBLEDevice.h>
 #include <esp_random.h>
+#include "control.hpp"
 
 // Service - Device information
 #define SERVICE_UUID_DEVICE_INFORMATION        "180A"
@@ -27,7 +28,30 @@
 #define HARDWARE_REVISION "1.2.0"
 
 #define RGB_LED 38
-static uint8_t s_led_state = 0;
+
+// motor pin
+#define IN1_PIN 5
+#define IN2_PIN 4
+#define IN3_PIN 6
+#define IN4_PIN 7
+#define IN5_PIN 11
+#define IN6_PIN 12
+#define IN7_PIN 14
+#define IN8_PIN 13
+
+#define POINT_X 100
+#define POINT_Y 100
+
+uint8_t  lastPointX = 100;
+uint8_t  lastPointY = 100;
+
+Motor leftFrontMotor = Motor();
+Motor rightFrontMotor = Motor();
+Motor leftRearMotor = Motor();
+Motor rightRearMotor = Motor();
+
+Control control = Control();
+
 
 static NimBLEServer *pServer;
 
@@ -110,12 +134,22 @@ class CharacteristicCallbacks : public NimBLECharacteristicCallbacks {
         if (!error) {
             uint8_t pointX = doc["pointX"];
             uint8_t pointY = doc["pointY"];
+            // 运行车辆
+            if (pointX != lastPointX) {
+                lastPointX = pointX;
+                Serial.print("pointX: ");
+                Serial.println(pointX);
+            }
+            if (pointY != lastPointY) {
+                lastPointY = pointY;
+                Serial.print("pointY: ");
+                Serial.println(pointY);
+            }
+            control.run(pointX, pointY);
             uint8_t padA = doc["padA"];
             uint8_t padB = doc["padB"];
             uint8_t padC = doc["padC"];
             uint8_t padD = doc["padD"];
-            Serial.print("padA: ");
-            Serial.println(padA);
             if (padA == 1) {
                 neopixelWrite(RGB_LED, 0, 255, 255);
             }
@@ -170,10 +204,22 @@ class CharacteristicCallbacks : public NimBLECharacteristicCallbacks {
 /** Define callback instances globally to use for multiple Charateristics */
 static CharacteristicCallbacks chrCallbacks;
 
+void initCar() {
+    // write your initialization code here
+    leftFrontMotor.attachMotorInit(IN3_PIN, IN4_PIN, 0 , 0);
+    rightFrontMotor.attachMotorInit(IN1_PIN, IN2_PIN, 0, 1);
+    leftRearMotor.attachMotorInit(IN5_PIN, IN6_PIN, 1, 0);
+    rightRearMotor.attachMotorInit(IN7_PIN, IN8_PIN, 1, 1);
+    // 初始化控制器
+    control.motorInit(leftFrontMotor, rightFrontMotor, leftRearMotor, rightRearMotor);
+    control.pointInit(POINT_X, POINT_Y);
+}
 
 void setup() {
     Serial.begin(115200);
     Serial.println("Starting NimBLE Server");
+    // 初始化
+    initCar();
 
     pinMode(RGB_LED, OUTPUT);
 
