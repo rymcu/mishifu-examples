@@ -206,8 +206,8 @@ static CharacteristicCallbacks chrCallbacks;
 
 void initCar() {
     // write your initialization code here
-    leftFrontMotor.attachMotorInit(IN3_PIN, IN4_PIN, 0 , 0);
-    rightFrontMotor.attachMotorInit(IN1_PIN, IN2_PIN, 0, 1);
+    leftFrontMotor.attachMotorInit(IN1_PIN, IN2_PIN, 0 , 0);
+    rightFrontMotor.attachMotorInit(IN3_PIN, IN4_PIN, 0, 1);
     leftRearMotor.attachMotorInit(IN5_PIN, IN6_PIN, 1, 0);
     rightRearMotor.attachMotorInit(IN7_PIN, IN8_PIN, 1, 1);
     // 初始化控制器
