@@ -25,16 +25,13 @@ void Control::pointInit(uint8_t pointX, uint8_t pointY) {
 }
 
 void Control::run(uint8_t pointX, uint8_t pointY) {
-    // 左右
-    int x = pointX - pointXZero;
-    // 前后
-    int y = pointY - pointYZero;
-    if (x == 0) {
-        if (y == 0) {
+    if (pointX == pointXZero) {
+        if (pointY == pointYZero) {
+            // 静止
             this->stop();
-        } else if (y < 0) {
+        } else if (pointY < pointYZero) {
             // 前进
-            uint8_t speed = Control::calculationSpeed(y);
+            uint8_t speed = pointYZero - pointY;
             Motor leftFrontMotor = motors[0];
             Motor rightFrontMotor = motors[1];
             Motor leftRearMotor = motors[2];
@@ -45,7 +42,7 @@ void Control::run(uint8_t pointX, uint8_t pointY) {
             rightRearMotor.motorForward(1, 1, speed);
         } else {
             // 倒车
-            uint8_t speed = Control::calculationSpeed(y);
+            uint8_t speed = pointY - pointYZero;
             Motor leftFrontMotor = motors[0];
             Motor rightFrontMotor = motors[1];
             Motor leftRearMotor = motors[2];
@@ -55,29 +52,36 @@ void Control::run(uint8_t pointX, uint8_t pointY) {
             leftRearMotor.motorReverse(1, 0, speed);
             rightRearMotor.motorReverse(1, 1, speed);
         }
-    } else if (x > 0) {
+    } else if (pointX > pointXZero) {
         // 右转
         Motor leftFrontMotor = motors[0];
         Motor rightFrontMotor = motors[1];
         Motor leftRearMotor = motors[2];
         Motor rightRearMotor = motors[3];
-        uint8_t turnSpeed = Control::calculationSpeed(50 - Control::calculationSpeed(x));
-        if (y == 0) {
-            uint8_t speed = Control::calculationSpeed(x);
+        // 值越大, 轮胎转速越小
+        uint8_t turnSpeed = 2 * pointYZero - pointX;
+        if (pointY == pointYZero) {
+            uint8_t speed = turnSpeed + 50 > 100 ? 100 : turnSpeed + 50;
             leftFrontMotor.motorForward(0, 0, speed);
             rightFrontMotor.motorForward(0, 1, turnSpeed);
             leftRearMotor.motorForward(1, 0, speed);
             rightRearMotor.motorForward(1, 1, speed);
-        } else if (y < 0) {
+        } else if (pointY < pointYZero) {
             // 前进
-            uint8_t speed = Control::calculationSpeed(y);
+            uint8_t speed = pointYZero - pointY;
+            if (speed < turnSpeed) {
+                speed = turnSpeed + 50 > 100 ? 100 : turnSpeed + 50;
+            }
             leftFrontMotor.motorForward(0, 0, speed);
             rightFrontMotor.motorForward(0, 1, turnSpeed);
             leftRearMotor.motorForward(1, 0, speed);
             rightRearMotor.motorForward(1, 1, speed);
         } else {
             // 倒车
-            uint8_t speed = Control::calculationSpeed(y);
+            uint8_t speed = pointY - pointYZero;
+            if (speed < turnSpeed) {
+                speed = turnSpeed + 50 > 100 ? 100 : turnSpeed + 50;
+            }
             leftFrontMotor.motorReverse(0, 0, speed);
             rightFrontMotor.motorReverse(0, 1, turnSpeed);
             leftRearMotor.motorReverse(1, 0, speed);
@@ -89,26 +93,32 @@ void Control::run(uint8_t pointX, uint8_t pointY) {
         Motor rightFrontMotor = motors[1];
         Motor leftRearMotor = motors[2];
         Motor rightRearMotor = motors[3];
-        uint8_t turnSpeed = Control::calculationSpeed(50 - Control::calculationSpeed(x));
-        if (y == 0) {
-            uint8_t speed = Control::calculationSpeed(x);
-            leftFrontMotor.motorForward(0, 0, turnSpeed);
+        uint8_t turnSpeed = pointX;
+        if (pointY == pointYZero) {
+            uint8_t speed = turnSpeed + 50 > 100 ? 100 : turnSpeed + 50;
+            leftFrontMotor.motorForward(0, 0, speed);
             rightFrontMotor.motorForward(0, 1, speed);
-            leftRearMotor.motorForward(1, 0, speed);
+            leftRearMotor.motorForward(1, 0, turnSpeed);
             rightRearMotor.motorForward(1, 1, speed);
-        } else if (y > 0) {
+        } else if (pointY > pointYZero) {
             // 前进
-            uint8_t speed = Control::calculationSpeed(y);
-            leftFrontMotor.motorForward(0, 0, 100 - turnSpeed);
+            uint8_t speed = pointYZero - pointY;
+            if (speed < turnSpeed) {
+                speed = turnSpeed + 50 > 100 ? 100 : turnSpeed + 50;
+            }
+            leftFrontMotor.motorForward(0, 0, speed);
             rightFrontMotor.motorForward(0, 1, speed);
-            leftRearMotor.motorForward(1, 0, speed);
+            leftRearMotor.motorForward(1, 0, turnSpeed);
             rightRearMotor.motorForward(1, 1, speed);
         } else {
             // 倒车
-            uint8_t speed = Control::calculationSpeed(y);
-            leftFrontMotor.motorReverse(0, 0, 100 - turnSpeed);
+            uint8_t speed = pointY - pointYZero;
+            if (speed < turnSpeed) {
+                speed = turnSpeed + 50 > 100 ? 100 : turnSpeed + 50;
+            }
+            leftFrontMotor.motorReverse(0, 0, speed);
             rightFrontMotor.motorReverse(0, 1, speed);
-            leftRearMotor.motorReverse(1, 0, speed);
+            leftRearMotor.motorReverse(1, 0, turnSpeed);
             rightRearMotor.motorReverse(1, 1, speed);
         }
     }
