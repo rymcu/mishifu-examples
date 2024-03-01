@@ -100,7 +100,7 @@ void Control::run(uint8_t pointX, uint8_t pointY) {
             rightFrontMotor.motorForward(0, 1, speed);
             leftRearMotor.motorForward(1, 0, turnSpeed);
             rightRearMotor.motorForward(1, 1, speed);
-        } else if (pointY > pointYZero) {
+        } else if (pointY < pointYZero) {
             // 前进
             uint8_t speed = pointYZero - pointY;
             if (speed < turnSpeed) {
