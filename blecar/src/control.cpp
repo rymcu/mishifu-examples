@@ -119,7 +119,7 @@ void Control::run(uint8_t pointX, uint8_t pointY) {
         } else {
             // 倒车
             uint8_t speed = pointY - pointYZero;
-            if (speed < turnSpe0000ed) {
+            if (speed < turnSpeed) {
                 speed = turnSpeed + 50 >= 100 ? 95 : turnSpeed + 50;
             }
             leftFrontMotor.motorReverse(0, 0, speed);
