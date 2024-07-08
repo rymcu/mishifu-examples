@@ -27,8 +27,9 @@
 #define FIRMWARE_REVISION "1.2.0"
 #define HARDWARE_REVISION "1.2.0"
 
-#define RGB_LED 38
 
+#if CONFIG_IDF_TARGET_ESP32S3
+#define RGB_LED 38
 // motor pin
 #define IN1_PIN 5
 #define IN2_PIN 4
@@ -39,11 +40,36 @@
 #define IN7_PIN 14
 #define IN8_PIN 13
 
+#elif CONFIG_IDF_TARGET_ESP32C3
+#define RGB_LED 38
+// motor pin
+#define IN1_PIN 5
+#define IN2_PIN 4
+#define IN3_PIN 6
+#define IN4_PIN 7
+#define IN5_PIN 11
+#define IN6_PIN 12
+#define IN7_PIN 14
+#define IN8_PIN 13
+
+#elif ESP32
+#define RGB_LED 17
+// motor pin
+#define IN1_PIN 19
+#define IN2_PIN 18
+#define IN3_PIN 23
+#define IN4_PIN 22
+#define IN5_PIN 33
+#define IN6_PIN 32
+#define IN7_PIN 12
+#define IN8_PIN 14
+#endif
+
 #define POINT_X 100
 #define POINT_Y 100
 
-uint8_t  lastPointX = 100;
-uint8_t  lastPointY = 100;
+uint8_t lastPointX = 100;
+uint8_t lastPointY = 100;
 
 Motor leftFrontMotor = Motor();
 Motor rightFrontMotor = Motor();
@@ -150,10 +176,12 @@ class CharacteristicCallbacks : public NimBLECharacteristicCallbacks {
             uint8_t padB = doc["padB"];
             uint8_t padC = doc["padC"];
             uint8_t padD = doc["padD"];
-            if (padA == 1) {
+            uint8_t light = doc["light"];
+            uint8_t videoCamera = doc["videoCamera"];
+            uint8_t sound = doc["sound"];
+            if (light == 1) {
                 neopixelWrite(RGB_LED, 0, 255, 255);
-            }
-            if (padB == 1) {
+            } else {
                 neopixelWrite(RGB_LED, 0, 0, 0);
             }
         }
@@ -206,7 +234,7 @@ static CharacteristicCallbacks chrCallbacks;
 
 void initCar() {
     // write your initialization code here
-    leftFrontMotor.attachMotorInit(IN1_PIN, IN2_PIN, 0 , 0);
+    leftFrontMotor.attachMotorInit(IN1_PIN, IN2_PIN, 0, 0);
     rightFrontMotor.attachMotorInit(IN3_PIN, IN4_PIN, 0, 1);
     leftRearMotor.attachMotorInit(IN5_PIN, IN6_PIN, 1, 0);
     rightRearMotor.attachMotorInit(IN7_PIN, IN8_PIN, 1, 1);
@@ -215,14 +243,7 @@ void initCar() {
     control.pointInit(POINT_X, POINT_Y);
 }
 
-void setup() {
-    Serial.begin(115200);
-    Serial.println("Starting NimBLE Server");
-    // 初始化
-    initCar();
-
-    pinMode(RGB_LED, OUTPUT);
-
+void initBLE() {
     /** sets device name */
     NimBLEDevice::init(MODEL_NUMBER);
 
@@ -310,6 +331,20 @@ void setup() {
     pAdvertising->start();
 
     Serial.println("Advertising Started");
+}
+
+void initLight() {
+    pinMode(RGB_LED, OUTPUT);
+    neopixelWrite(RGB_LED, 0, 0, 0);
+}
+
+void setup() {
+    Serial.begin(115200);
+    Serial.println("Starting NimBLE Server");
+    // 初始化
+    initCar();
+    initLight();
+    initBLE();
 }
 
 
