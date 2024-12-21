@@ -1,7 +1,7 @@
-# 米师傅工具箱小程序配套硬件端代码
-> 米师傅工具箱 —— 电子工程师的瑞士军刀, 由 [RYMCU 社区](https://rymcu.com) ( https://rymcu.com ) 倾情打造。
+# 艾塔达克小程序配套硬件端代码
+> 艾塔达克 —— 电子工程师的瑞士军刀, 由 [RYMCU 社区](https://rymcu.com) ( https://rymcu.com ) 倾情打造。
 > 
-> ![米师傅工具箱](https://github.com/rymcu/mishifu-examples/assets/29698602/dc9604a0-cee9-4d78-a248-c4e431ef38d8)
+> ![艾塔达克](https://github.com/rymcu/mishifu-examples/assets/29698602/dc9604a0-cee9-4d78-a248-c4e431ef38d8)
 
 
 ## E32CAR
